@@ -4,14 +4,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Central Limit Theorem App</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #distPlot, #meanPlot {
+      width: 100%;
+      height: 400px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1 class="mt-5">Central Limit Theorem Illustration</h1>
-    <p class="lead">This Shiny app demonstrates the Central Limit Theorem by allowing you to sample from different distributions.</p>
-    <p>Click the link below to launch the app:</p>
-    <a href="https://your-shiny-server-url/CentralLimitTheoremApp/" class="btn btn-primary">Launch App</a>
+    <p class="lead">This web app demonstrates the Central Limit Theorem using JavaScript and Plotly.js.</p>
+    
+    <div>
+      <label for="dist">Choose Distribution:</label>
+      <select id="dist">
+        <option value="uniform">Uniform</option>
+        <option value="exponential">Exponential</option>
+        <option value="binomial">Binomial</option>
+      </select>
+    </div>
+    <div>
+      <label for="n">Sample Size (n):</label>
+      <input type="number" id="n" value="30" min="1">
+    </div>
+    <div>
+      <label for="samples">Number of Samples:</label>
+      <input type="number" id="samples" value="1000" min="100">
+    </div>
+    <button id="draw">Draw Samples</button>
+
+    <h2>Original Distribution</h2>
+    <div id="distPlot"></div>
+
+    <h2>Distribution of Sample Means</h2>
+    <div id="meanPlot"></div>
   </div>
+
+  <script>
+    document.getElementById('draw').addEventListener('click', function() {
+      const n = parseInt(document.getElementById('n').value);
+      const samples = parseInt(document.getElementById('samples').value);
+      const dist = document.getElementById('dist').value;
+
+      let data = [];
+      for (let i = 0; i < samples; i++) {
+        let sample = [];
+        for (let j = 0; j < n; j++) {
+          if (dist === 'uniform') {
+            sample.push(Math.random());
+          } else if (dist === 'exponential') {
+            sample.push(-Math.log(Math.random()));
+          } else if (dist === 'binomial') {
+            sample.push(Math.floor(Math.random() * 2));
+          }
+        }
+        data.push(sample.reduce((a, b) => a + b) / sample.length);
+      }
+
+      Plotly.newPlot('distPlot', [{
+        x: data,
+        type: 'histogram',
+        autobinx: false,
+        xbins: {
+          end: 1,
+          size: 0.05,
+          start: 0
+        }
+      }], {title: 'Distribution of Sample Means'});
+    });
+  </script>
 </body>
 </html>
